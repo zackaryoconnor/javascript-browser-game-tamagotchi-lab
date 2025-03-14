@@ -8,64 +8,113 @@ const state = {
 let timeElapsed = 0;
 let randomNumber;
 let randomState = ``;
+let boredomElement = document.querySelector(`#boredom-stat`);
+let hungerElement = document.querySelector(`#hunger-stat`);
+let sleepinessElement = document.querySelector(`#sleepiness-stat`);
+let interval;
 
 const buttonWrapperElement = document.querySelector(`.button-wrapper`);
-let boredomLabel = document.querySelector(`#boredom-stat`);
-let hungerLabel = document.querySelector(`#hunger-stat`);
-let sleepinessLabel = document.querySelector(`#sleepiness-stat`);
+const gameOverMessageElement = document.querySelector(`#message`);
+const playAgainButtonElement = document.querySelector(`#restart`);
 
 
-const interval = setInterval(() => {
-    timeElapsed += 1
-    console.log(timeElapsed, `seconds passed`);
-    if (timeElapsed % 5 === 0) {
-        getRandomNumber();
-        getRandomState();
-        updateLabel(randomState);
-    }
+const startGame = () => {
+    interval = setInterval(() => {
+        timeElapsed += 1;
+        console.log(timeElapsed, `seconds passed`);
+        if (timeElapsed % 5 === 0) {
+            getRandomNumber();
+            getRandomState();
+            updateLabel(randomState);
+        }
 
-    if (timeElapsed >= 30) {
-        clearInterval(interval);
-    }
-}, 1000);
+        if (timeElapsed >= 30) {
+            gameOver();
+        }
+    }, 1000);
+};
+
+
+setTimeout(startGame, 1000)
 
 
 const updateLabel = label => {
     if (label === `boredom`) {
         state.boredom += randomNumber;
-        boredomLabel.textContent = state.boredom;
+        boredomElement.textContent = state.boredom;
     } else if (label === `hunger`) {
         state.hunger += randomNumber;
-        hungerLabel.textContent = state.hunger;
+        hungerElement.textContent = state.hunger;
     } else if (label === `sleepiness`) {
         state.sleepiness += randomNumber;
-        sleepinessLabel.textContent = state.sleepiness;
+        sleepinessElement.textContent = state.sleepiness;
     }
 }
 
 
+
+
 const getRandomNumber = () => {
     randomNumber = Math.floor(Math.random() * 3) + 1;
-    console.log(`random number`, randomNumber)
+    console.log(`random number`, randomNumber);
 }
+
+
 
 
 const getRandomState = () => {
     const keys = Object.keys(state);
     randomState = keys[Math.floor(Math.random() * keys.length)];
-    console.log(`random state:`, randomState)
+    console.log(`random state:`, randomState);
 };
+
+
+
+
+const gameOver = () => {
+    if (timeElapsed >= 30) {
+        clearInterval(interval);
+
+        gameOverMessageElement.style.visibility = `visible`;
+        playAgainButtonElement.style.visibility = `visible`;
+    }
+}
+
+
+
+
+const resetGame = () => {
+    state.boredom = 0;
+    state.hunger = 0;
+    state.sleepiness = 0;
+    timeElapsed = 0;
+    boredomElement.textContent = state.boredom;
+    hungerElement.textContent = state.hunger;
+    sleepinessElement.textContent = state.sleepiness;
+    gameOverMessageElement.style.visibility = `hidden`;
+    playAgainButtonElement.style.visibility = `hidden`;
+    startGame();
+};
+
+
+
+
+playAgainButtonElement.addEventListener(`click`, () => {
+    resetGame();
+})
+
+
 
 
 buttonWrapperElement.addEventListener('click', event => {
     if (event.target.textContent === `play`) {
-        boredomLabel.textContent = `0`;
+        boredomElement.textContent = `0`;
         state.boredom = 0;
     } else if (event.target.textContent === `feed`) {
         state.hunger = 0;
-        hungerLabel.textContent = `0`;
+        hungerElement.textContent = `0`;
     } else if (event.target.textContent === `sleep`) {
         state.sleepiness = 0;
-        sleepinessLabel.textContent = `0`;
-    }    
+        sleepinessElement.textContent = `0`;
+    }
 });
